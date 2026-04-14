@@ -10,8 +10,21 @@ const authMiddleware = (req, res, next) => {
     
     const token = authHeader.substring(7);
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    // Verify JWT_SECRET exists
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined in environment variables');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Validate token payload
+    if (!decoded.userId) {
+      return res.status(401).json({ error: 'Invalid token payload' });
+    }
+    
     req.userId = decoded.userId;
+    req.tokenIat = decoded.iat; // Token issued at time
     
     next();
   } catch (error) {

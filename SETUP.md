@@ -45,6 +45,12 @@ MONGODB_URI=mongodb://localhost:27017/boompets
 JWT_SECRET=your-secret-key-change-this-in-production
 PORT=3000
 NODE_ENV=development
+ALLOWED_ORIGINS=http://localhost:19006,http://localhost:8081
+```
+
+**⚠️ Security Note**: Generate a strong JWT secret for production:
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 ### Frontend
@@ -52,6 +58,24 @@ Update `src/services/api.js` if needed to point to your backend:
 ```javascript
 const API_BASE_URL = 'http://localhost:3000';
 ```
+
+## 🔒 Security Features
+
+BoomPets implements comprehensive security measures:
+
+- **Authentication**: JWT-based with secure token generation
+- **Password Security**: Bcrypt hashing with 12 salt rounds
+- **Rate Limiting**: Protection against brute force attacks
+  - General API: 100 requests / 15 minutes
+  - Authentication: 5 attempts / 15 minutes
+- **Input Validation**: NoSQL injection prevention and sanitization
+- **Security Headers**: Helmet middleware for HTTP security
+- **CORS Protection**: Configurable allowed origins
+- **Password Requirements**:
+  - Minimum 8 characters
+  - At least one letter, number, and special character
+
+See `SECURITY.md` for detailed security documentation.
 
 ## 🧪 Running Tests
 

@@ -114,15 +114,16 @@ describe('User Model Validation - Property Tests', () => {
     );
   });
 
-  it('should accept valid passwords with 8+ characters, letters, and numbers', async () => {
+  it('should accept valid passwords with 8+ characters, letters, numbers, and special characters', async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.tuple(
-          fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), { minLength: 5, maxLength: 10 }),
-          fc.stringOf(fc.constantFrom(...'0123456789'), { minLength: 3, maxLength: 5 })
-        ).map(([letters, numbers]) => {
-          // Shuffle to create a valid password (guaranteed 8+ chars)
-          const combined = (letters + numbers).split('');
+          fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), { minLength: 4, maxLength: 8 }),
+          fc.stringOf(fc.constantFrom(...'0123456789'), { minLength: 2, maxLength: 4 }),
+          fc.stringOf(fc.constantFrom(...'!@#$%^&*'), { minLength: 1, maxLength: 2 })
+        ).map(([letters, numbers, special]) => {
+          // Shuffle to create a valid password (guaranteed 8+ chars with all requirements)
+          const combined = (letters + numbers + special).split('');
           for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [combined[i], combined[j]] = [combined[j], combined[i]];
@@ -145,7 +146,7 @@ describe('User Model Validation - Property Tests', () => {
           expect(response.status).toBe(201);
           expect(response.body.token).toBeDefined();
           expect(response.body.user).toBeDefined();
-          expect(response.body.user.email).toBe(email);
+          expect(response.body.user.email).toBe(email.toLowerCase());
         }
       ),
       { numRuns: 100 }
