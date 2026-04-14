@@ -50,7 +50,9 @@ router.post('/register', authLimiter, sanitizeInput, validateRequiredFields(['em
       return res.status(409).json({ error: 'User already exists' });
     }
     
-    const hashedPassword = await bcrypt.hash(password, 12); // Increased salt rounds
+    // Use fewer rounds in test environment for faster tests
+    const saltRounds = process.env.NODE_ENV === 'test' ? 4 : 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = new User({ 
       email: email.toLowerCase(), 
       password: hashedPassword, 

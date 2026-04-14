@@ -40,9 +40,11 @@ afterEach(async () => {
 
 // Helper function to create a test user and get auth token
 async function createUserAndToken() {
+  const bcrypt = require('bcryptjs');
+  const hashedPassword = await bcrypt.hash('hashedpass123!', 4);
   const user = new User({
     email: `test${Date.now()}@example.com`,
-    password: 'hashedpass123!',
+    password: hashedPassword,
     name: 'Test User'
   });
   await user.save();

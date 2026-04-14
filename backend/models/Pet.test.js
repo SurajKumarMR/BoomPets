@@ -24,9 +24,11 @@ beforeAll(async () => {
   app.use('/api/pets', petsRouter);
   
   // Create a test user for pet associations
+  const bcrypt = require('bcryptjs');
+  const hashedPassword = await bcrypt.hash('hashedpass123!', 4);
   const testUser = await User.create({
     email: 'test@example.com',
-    password: 'hashedpass123!',
+    password: hashedPassword,
     name: 'Test User'
   });
   testUserId = testUser._id;

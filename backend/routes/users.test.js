@@ -40,11 +40,11 @@ describe('Authentication Property Tests', () => {
   it('should create account and return token for any valid credentials', async () => {
     // Custom generator for valid passwords (min 8 chars with letters, numbers, and special chars)
     const validPasswordArb = fc.tuple(
-      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 4, maxLength: 12 }),
+      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 5, maxLength: 12 }),
       fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 2, maxLength: 4 }),
       fc.stringOf(fc.constantFrom('!', '@', '#', '$', '%', '^', '&', '*'), { minLength: 1, maxLength: 2 })
     ).map(([letters, numbers, special]) => {
-      // Shuffle to ensure randomness
+      // Shuffle to ensure randomness (guaranteed 8+ chars: 5+2+1=8 minimum)
       const combined = (letters + numbers + special).split('');
       for (let i = combined.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -113,11 +113,11 @@ describe('Authentication Property Tests', () => {
   it('should return token for any valid login credentials', async () => {
     // Custom generator for valid passwords (min 8 chars with letters, numbers, and special chars)
     const validPasswordArb = fc.tuple(
-      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 4, maxLength: 12 }),
+      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 5, maxLength: 12 }),
       fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 2, maxLength: 4 }),
       fc.stringOf(fc.constantFrom('!', '@', '#', '$', '%', '^', '&', '*'), { minLength: 1, maxLength: 2 })
     ).map(([letters, numbers, special]) => {
-      // Shuffle to ensure randomness
+      // Shuffle to ensure randomness (guaranteed 8+ chars: 5+2+1=8 minimum)
       const combined = (letters + numbers + special).split('');
       for (let i = combined.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
