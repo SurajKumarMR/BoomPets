@@ -118,9 +118,9 @@ describe('User Model Validation - Property Tests', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.tuple(
-          fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), { minLength: 4, maxLength: 8 }),
+          fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), { minLength: 5, maxLength: 10 }),
           fc.stringOf(fc.constantFrom(...'0123456789'), { minLength: 2, maxLength: 4 }),
-          fc.stringOf(fc.constantFrom(...'!@#$%^&*'), { minLength: 1, maxLength: 2 })
+          fc.stringOf(fc.constantFrom(...'!@#$%^&*'), { minLength: 1, maxLength: 3 })
         ).map(([letters, numbers, special]) => {
           // Shuffle to create a valid password (guaranteed 8+ chars with all requirements)
           const combined = (letters + numbers + special).split('');

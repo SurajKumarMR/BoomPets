@@ -26,7 +26,7 @@ beforeAll(async () => {
   // Create a test user for pet associations
   const testUser = await User.create({
     email: 'test@example.com',
-    password: 'hashedpassword123',
+    password: 'hashedpass123!',
     name: 'Test User'
   });
   testUserId = testUser._id;

@@ -38,11 +38,20 @@ describe('Authentication Property Tests', () => {
    * - Complete within 2 seconds
    */
   it('should create account and return token for any valid credentials', async () => {
-    // Custom generator for valid passwords (min 8 chars with letters and numbers)
+    // Custom generator for valid passwords (min 8 chars with letters, numbers, and special chars)
     const validPasswordArb = fc.tuple(
-      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 5, maxLength: 15 }),
-      fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 3, maxLength: 5 })
-    ).map(([letters, numbers]) => letters + numbers);
+      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 4, maxLength: 12 }),
+      fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 2, maxLength: 4 }),
+      fc.stringOf(fc.constantFrom('!', '@', '#', '$', '%', '^', '&', '*'), { minLength: 1, maxLength: 2 })
+    ).map(([letters, numbers, special]) => {
+      // Shuffle to ensure randomness
+      const combined = (letters + numbers + special).split('');
+      for (let i = combined.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [combined[i], combined[j]] = [combined[j], combined[i]];
+      }
+      return combined.join('');
+    });
 
     // Custom generator for valid names (alphanumeric and spaces only)
     const validNameArb = fc.stringOf(
@@ -73,7 +82,7 @@ describe('Authentication Property Tests', () => {
           expect(response.body).toHaveProperty('user');
           expect(response.body).toHaveProperty('token');
           expect(response.body.user).toHaveProperty('id');
-          expect(response.body.user.email).toBe(uniqueEmail);
+          expect(response.body.user.email).toBe(uniqueEmail.toLowerCase());
           expect(response.body.user.name).toBe(name.trim()); // Backend trims names
           expect(typeof response.body.token).toBe('string');
           expect(response.body.token.length).toBeGreaterThan(0);
@@ -102,11 +111,20 @@ describe('Authentication Property Tests', () => {
    * - Complete within 2 seconds
    */
   it('should return token for any valid login credentials', async () => {
-    // Custom generator for valid passwords (min 8 chars with letters and numbers)
+    // Custom generator for valid passwords (min 8 chars with letters, numbers, and special chars)
     const validPasswordArb = fc.tuple(
-      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 5, maxLength: 15 }),
-      fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 3, maxLength: 5 })
-    ).map(([letters, numbers]) => letters + numbers);
+      fc.stringOf(fc.constantFrom('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'), { minLength: 4, maxLength: 12 }),
+      fc.stringOf(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 2, maxLength: 4 }),
+      fc.stringOf(fc.constantFrom('!', '@', '#', '$', '%', '^', '&', '*'), { minLength: 1, maxLength: 2 })
+    ).map(([letters, numbers, special]) => {
+      // Shuffle to ensure randomness
+      const combined = (letters + numbers + special).split('');
+      for (let i = combined.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [combined[i], combined[j]] = [combined[j], combined[i]];
+      }
+      return combined.join('');
+    });
 
     // Custom generator for valid names (alphanumeric and spaces only)
     const validNameArb = fc.stringOf(
@@ -143,7 +161,7 @@ describe('Authentication Property Tests', () => {
           expect(response.body).toHaveProperty('user');
           expect(response.body).toHaveProperty('token');
           expect(response.body.user).toHaveProperty('id');
-          expect(response.body.user.email).toBe(uniqueEmail);
+          expect(response.body.user.email).toBe(uniqueEmail.toLowerCase());
           expect(response.body.user.name).toBe(name.trim()); // Backend trims names
           expect(typeof response.body.token).toBe('string');
           expect(response.body.token.length).toBeGreaterThan(0);
@@ -278,7 +296,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject password with exactly 7 characters', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: 'abc1234' });
+        .send({ email: `test-7chars-${Date.now()}@example.com`, password: 'abc1234' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Password must be at least 8 characters');
@@ -287,7 +305,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with exactly 8 characters', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test8@example.com', password: 'abcd1234' });
+        .send({ email: `test8-${Date.now()}@example.com`, password: 'abcd123!' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -296,7 +314,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject empty password', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: '' });
+        .send({ email: `test-empty-${Date.now()}@example.com`, password: '' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Missing required fields: password');
@@ -307,7 +325,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject password with only letters', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: 'abcdefgh' });
+        .send({ email: `test-letters-${Date.now()}@example.com`, password: 'abcdefgh' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Password must contain at least one number');
@@ -316,7 +334,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject password with only numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: '12345678' });
+        .send({ email: `test-numbers-${Date.now()}@example.com`, password: '12345678' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Password must contain at least one letter');
@@ -325,7 +343,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with uppercase letters and numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testUpper@example.com', password: 'ABCD1234' });
+        .send({ email: `testUpper-${Date.now()}@example.com`, password: 'ABCD123!' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -334,7 +352,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with mixed case letters and numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testMixed@example.com', password: 'AbCd1234' });
+        .send({ email: `testMixed-${Date.now()}@example.com`, password: 'AbCd123!' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -343,7 +361,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with single letter and multiple numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testSingleLetter@example.com', password: 'a1234567' });
+        .send({ email: `testSingleLetter-${Date.now()}@example.com`, password: 'a123456!' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -352,7 +370,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with multiple letters and single number', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testSingleNumber@example.com', password: 'abcdefg1' });
+        .send({ email: `testSingleNumber-${Date.now()}@example.com`, password: 'abcdefg1!' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -363,7 +381,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with special characters', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testSpecial@example.com', password: 'abc123!@#' });
+        .send({ email: `testSpecial-${Date.now()}@example.com`, password: 'abc123!@#' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -372,7 +390,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with only special characters, letters, and numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testSpecial2@example.com', password: '!@#$abc123' });
+        .send({ email: `testSpecial2-${Date.now()}@example.com`, password: '!@#$abc123' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -381,7 +399,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject password with only special characters and letters', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: '!@#$abcd' });
+        .send({ email: `test-special-letters-${Date.now()}@example.com`, password: '!@#$abcd' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Password must contain at least one number');
@@ -390,7 +408,7 @@ describe('Password Validation Unit Tests', () => {
     it('should reject password with only special characters and numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'test@example.com', password: '!@#$1234' });
+        .send({ email: `test-special-numbers-${Date.now()}@example.com`, password: '!@#$1234' });
       
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Password must contain at least one letter');
@@ -399,7 +417,7 @@ describe('Password Validation Unit Tests', () => {
     it('should accept password with spaces, letters, and numbers', async () => {
       const response = await request(app)
         .post('/api/users/register')
-        .send({ email: 'testSpaces@example.com', password: 'abc 123 xyz' });
+        .send({ email: `testSpaces-${Date.now()}@example.com`, password: 'abc 123! xyz' });
       
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');

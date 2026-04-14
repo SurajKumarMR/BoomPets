@@ -37,7 +37,7 @@ afterEach(async () => {
 async function createUserAndToken() {
   const user = new User({
     email: `test${Date.now()}@example.com`,
-    password: 'hashedpassword123',
+    password: 'hashedpass123!',
     name: 'Test User'
   });
   await user.save();
