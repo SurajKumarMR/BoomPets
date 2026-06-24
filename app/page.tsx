@@ -1,65 +1,162 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+
+export default function HomePage() {
+  const [petName] = useState('Marshall');
+  const [healthPlanProgress] = useState(85);
+  
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white px-4 py-3 flex items-center justify-between border-b">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🐾</span>
+          <h1 className="text-xl font-bold text-brown-900">BoomPets</h1>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex items-center gap-3">
+          <button className="p-2">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+          </button>
+          <div className="w-10 h-10 rounded-full bg-gray-300"></div>
         </div>
-      </main>
+      </header>
+
+      {/* Hero Section */}
+      <div className="bg-gray-900 text-white p-6 rounded-3xl mx-4 mt-4">
+        <p className="text-sm opacity-80 mb-1">MONDAY, OCT 23</p>
+        <h2 className="text-2xl font-bold mb-2">Good day, {petName}</h2>
+        <p className="mb-4 opacity-90">
+          Cooper's health plan is {healthPlanProgress}% complete today.
+        </p>
+        <button className="bg-orange-500 text-black px-6 py-3 rounded-xl font-semibold flex items-center gap-2">
+          Find a nutritionist
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="flex justify-around px-4 py-6">
+        <div className="text-center">
+          <div className="text-3xl mb-1">🔥</div>
+          <p className="text-2xl font-bold">12</p>
+          <p className="text-sm text-gray-600">STREAK</p>
+        </div>
+        <div className="text-center">
+          <div className="text-3xl mb-1">🍽️</div>
+          <p className="text-2xl font-bold">3/4</p>
+          <p className="text-sm text-gray-600">MEALS</p>
+        </div>
+        <div className="text-center">
+          <div className="text-3xl mb-1">⚙️</div>
+          <p className="text-2xl font-bold">PRO</p>
+          <p className="text-sm text-gray-600">PLAN</p>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-4 mb-6">
+        <h3 className="font-semibold mb-3">Quick Actions</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/nutrition" className="bg-green-50 p-6 rounded-2xl">
+            <div className="text-3xl mb-2">📄</div>
+            <h4 className="font-semibold">Plan</h4>
+            <p className="text-sm text-gray-600">View nutrition</p>
+          </Link>
+          <Link href="/track" className="bg-orange-50 p-6 rounded-2xl">
+            <div className="text-3xl mb-2">📊</div>
+            <h4 className="font-semibold">Tracker</h4>
+            <p className="text-sm text-gray-600">Weight & Vitals</p>
+          </Link>
+          <Link href="/consult" className="bg-blue-50 p-6 rounded-2xl">
+            <div className="text-3xl mb-2">🏥</div>
+            <h4 className="font-semibold">Consult</h4>
+            <p className="text-sm text-gray-600">Speak to Vet</p>
+          </Link>
+          <Link href="/history" className="bg-yellow-50 p-6 rounded-2xl">
+            <div className="text-3xl mb-2">📜</div>
+            <h4 className="font-semibold">History</h4>
+            <p className="text-sm text-gray-600">All logs</p>
+          </Link>
+        </div>
+      </div>
+
+      {/* Reminders */}
+      <div className="px-4 mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-semibold">Reminders</h3>
+          <Link href="/reminders" className="text-sm text-orange-600">VIEW ALL</Link>
+        </div>
+        <div className="space-y-3">
+          <div className="bg-red-50 p-4 rounded-2xl flex items-center gap-4">
+            <div className="bg-red-200 p-3 rounded-full text-2xl">💉</div>
+            <div className="flex-1">
+              <h4 className="font-semibold">Rabies Vaccine</h4>
+              <p className="text-sm text-gray-600">Due in 3 days • Dr. Smith</p>
+            </div>
+            <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">URGENT</span>
+          </div>
+          <div className="bg-green-50 p-4 rounded-2xl flex items-center gap-4">
+            <div className="bg-green-200 p-3 rounded-full text-2xl">💊</div>
+            <div className="flex-1">
+              <h4 className="font-semibold">Vitamin Supplement</h4>
+              <p className="text-sm text-gray-600">Daily at 8:00 PM</p>
+            </div>
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3">
+        <div className="flex justify-around">
+          <Link href="/" className="flex flex-col items-center text-brown-700">
+            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span className="text-xs font-medium">Home</span>
+          </Link>
+          <Link href="/plan" className="flex flex-col items-center text-gray-500">
+            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+            </svg>
+            <span className="text-xs">My Plan</span>
+          </Link>
+          <Link href="/track" className="flex flex-col items-center text-gray-500">
+            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span className="text-xs">Track</span>
+          </Link>
+          <Link href="/consult" className="flex flex-col items-center text-gray-500">
+            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/>
+            </svg>
+            <span className="text-xs">Consult</span>
+          </Link>
+          <Link href="/more" className="flex flex-col items-center text-gray-500">
+            <svg className="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            <span className="text-xs">More</span>
+          </Link>
+        </div>
+      </nav>
+
+      {/* FAB */}
+      <button className="fixed bottom-20 right-6 bg-brown-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center">
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
     </div>
   );
 }
