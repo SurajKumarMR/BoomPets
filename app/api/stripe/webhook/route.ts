@@ -31,16 +31,32 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        
-        // Update user subscription in database
+        const userId = session.metadata?.userId;
+
+        if (!userId) {
+          console.error('Webhook missing userId in session metadata');
+          break;
+        }
+
+        const { data: user } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .single();
+
+        if (!user) {
+          console.error('Webhook userId not found in database:', userId);
+          break;
+        }
+
         await supabaseAdmin
           .from('users')
-          .update({ 
+          .update({
             subscription_tier: 'pro',
-            stripe_customer_id: session.customer 
+            stripe_customer_id: session.customer,
           })
-          .eq('id', session.metadata?.userId);
-        
+          .eq('id', userId);
+
         break;
       }
 

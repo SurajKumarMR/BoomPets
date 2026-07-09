@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireRole } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { stripeConnectSchema } from '@/lib/validation/schemas';
+import { parseJsonBody } from '@/lib/validation/parse-body';
 
-// Create Stripe Connect account for nutritionists (marketplace sellers)
 export async function POST(request: NextRequest) {
+  const rateLimited = checkRateLimit(request, RATE_LIMITS.connect, 'stripe-connect');
+  if (rateLimited) return rateLimited;
+
+  const authResult = await requireRole(request, ['nutritionist', 'vet']);
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     if (!stripe) {
       return NextResponse.json(
@@ -11,7 +20,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, country, userId } = await request.json();
+    const parsed = await parseJsonBody(request, stripeConnectSchema);
+    if ('error' in parsed) return parsed.error;
+
+    const { email, country } = parsed.data;
 
     const account = await stripe.accounts.create({
       type: 'express',
@@ -23,7 +35,7 @@ export async function POST(request: NextRequest) {
       },
       business_type: 'individual',
       metadata: {
-        userId,
+        userId: authResult.id,
       },
     });
 
@@ -34,9 +46,9 @@ export async function POST(request: NextRequest) {
       type: 'account_onboarding',
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       accountId: account.id,
-      onboardingUrl: accountLink.url 
+      onboardingUrl: accountLink.url,
     });
   } catch (error) {
     console.error('Stripe Connect error:', error);
