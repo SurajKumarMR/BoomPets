@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
 const specialists = [
@@ -43,7 +43,41 @@ const specialists = [
 ];
 
 export default function ConsultPage() {
-  const [selectedSpecialty, setSelectedSpecialty] = useState('emergency');
+  const [selectedSpecialty, setSelectedSpecialty] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'rating' | 'price' | 'experience'>('rating');
+
+  // Filter and search specialists
+  const filteredSpecialists = useMemo(() => {
+    let filtered = specialists;
+
+    // Filter by specialty
+    if (selectedSpecialty !== 'all') {
+      filtered = filtered.filter((s) =>
+        s.specialty.toLowerCase().includes(selectedSpecialty.toLowerCase())
+      );
+    }
+
+    // Search by name or specialty
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(query) ||
+          s.specialty.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort specialists
+    filtered = [...filtered].sort((a, b) => {
+      if (sortBy === 'rating') return b.rating - a.rating;
+      if (sortBy === 'price') return a.price - b.price;
+      if (sortBy === 'experience') return b.experience - a.experience;
+      return 0;
+    });
+
+    return filtered;
+  }, [selectedSpecialty, searchQuery, sortBy]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -99,12 +133,19 @@ export default function ConsultPage() {
           <input
             type="text"
             placeholder="Search by specialty or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-4 py-3 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
           />
           <svg className="w-5 h-5 absolute right-3 top-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
+        {searchQuery && (
+          <p className="text-sm text-gray-600 mt-2">
+            Found {filteredSpecialists.length} specialist{filteredSpecialists.length !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
       {/* Specialty Filters */}
@@ -150,11 +191,26 @@ export default function ConsultPage() {
       <div className="px-4 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold">Available Specialists</h3>
-          <Link href="/consult/all" className="text-orange-600 text-sm font-medium">See All</Link>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option value="rating">Sort by Rating</option>
+            <option value="price">Sort by Price</option>
+            <option value="experience">Sort by Experience</option>
+          </select>
         </div>
 
-        <div className="space-y-4">
-          {specialists.map((specialist) => (
+        {filteredSpecialists.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 text-center">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No specialists found</h3>
+            <p className="text-gray-600">Try adjusting your search or filters</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredSpecialists.map((specialist) => (
             <div key={specialist.id} className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex gap-4">
                 <div className="relative">
@@ -214,6 +270,7 @@ export default function ConsultPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Join as Nutritionist Banner */}
